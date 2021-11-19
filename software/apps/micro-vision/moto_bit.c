@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -6,12 +5,12 @@
 
 #include "moto_bit.h"
 #include "nrf_delay.h"
-#include <stdio.h>
 #include "nrf_delay.h"
 #include "nrf_twi_mngr.h"
 
 #include "microbit_v2.h"
 #include "moto_bit.h"
+#include "nrf_assert.h"
 
 static const nrf_twi_mngr_t* i2c_interface = NULL;
 
@@ -30,7 +29,7 @@ static uint8_t i2c_reg_read(uint8_t i2c_addr, uint8_t reg_addr) {
     NRF_TWI_MNGR_READ(i2c_addr, &rx_buf, 1, 0)
   };
   ret_code_t ret = nrf_twi_mngr_perform(i2c_interface, NULL, read_transfer, 2, NULL);
-  assert(ret == NRF_SUCCESS);
+  ASSERT(ret == NRF_SUCCESS);
 
   return rx_buf;
 }
@@ -46,13 +45,13 @@ static void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data) {
     NRF_TWI_MNGR_WRITE(i2c_addr, datas, 2, 0),
   };
   ret_code_t ret = nrf_twi_mngr_perform(i2c_interface, NULL, write_transfer, 1, NULL);
-  //assert(ret == NRF_SUCCESS);
+  //ASSERT(ret == NRF_SUCCESS);
   //printf("ret %d, success %d\n", ret, NRF_SUCCESS);
 }
 
 // See moto_bit.h
 void moto_bit_init(const nrf_twi_mngr_t* i2c) {
-    assert(i2c != NULL);
+    ASSERT(i2c != NULL);
     i2c_interface = i2c;
     moto_bit_enable_motors();
     //i2c_reg_write(MOTO_BIT_ADDR, LEFT_MOTOR, 255);
@@ -81,7 +80,7 @@ static void set_straight() {
 
 // See moto_bit.h
 void moto_bit_turn(float angle, float speed) {
-    assert(speed >= 0);
+    ASSERT(speed >= 0);
 
     float millis = (angle >= 0 ? angle : -1*angle) / DEG_PER_UNIT_DIST / speed;
     if (angle > 0) {
@@ -98,7 +97,7 @@ void moto_bit_turn(float angle, float speed) {
 
 // See moto_bit.h
 void moto_bit_set_speed(float speed) {
-    assert(speed <= 1.0f && speed >= -1.0f);
+    ASSERT(speed <= 1.0f && speed >= -1.0f);
 
     uint8_t speed_val = 0;
     if (speed >= 0) {
@@ -124,7 +123,7 @@ void moto_bit_set_motor_inverted(moto_bit_reg_t motor, bool inverted) {
         motor = INVERT_RIGHT;
     }
 
-    assert(motor == INVERT_LEFT || motor == INVERT_RIGHT);
+    ASSERT(motor == INVERT_LEFT || motor == INVERT_RIGHT);
 
     i2c_reg_write(MOTO_BIT_ADDR, motor, inverted ? 1 : 0);
 }
