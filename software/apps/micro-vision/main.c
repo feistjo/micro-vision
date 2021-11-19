@@ -44,25 +44,26 @@ int main(void) {
   printf("moto:bit initialized\n");
 
   printf("Moving forward\n");
-  moto_bit_set_speed(1.0f);
+  moto_bit_set_speed(0.5f);
   nrf_delay_ms(2000);
 
   printf("Turning left\n");
-  moto_bit_turn(90, 0.25f);
+  moto_bit_turn(90, 0.5f);
 
-  printf("Stopping\n");
+  printf("Forward\n");
   moto_bit_set_speed(0.5f);
   nrf_delay_ms(2000);
 
   moto_bit_stop();
-  nrf_delay_ms(1000);
+  nrf_delay_ms(2000);
 
   moto_bit_set_speed(-0.5f);
   nrf_delay_ms(2000);
 
-  moto_bit_turn(-90, 0.25f);
+  moto_bit_turn(-90, 0.5f);
+  //nrf_delay_ms(1000);
 
-  moto_bit_set_speed(-1.0f);
+  moto_bit_set_speed(-0.5f);
   nrf_delay_ms(2000);
 
   moto_bit_stop();

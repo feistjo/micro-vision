@@ -15,7 +15,7 @@
 
 static const nrf_twi_mngr_t* i2c_interface = NULL;
 
-static float DEG_PER_UNIT_DIST = 0.1f; // TODO
+static float DEG_PER_UNIT_DIST = 0.4f; // TODO
 
 // Helper function to perform a 1-byte I2C read of a given register
 //
@@ -46,8 +46,8 @@ static void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data) {
     NRF_TWI_MNGR_WRITE(i2c_addr, datas, 2, 0),
   };
   ret_code_t ret = nrf_twi_mngr_perform(i2c_interface, NULL, write_transfer, 1, NULL);
-  assert(ret == NRF_SUCCESS);
-  printf("ret %d, success %d\n", ret, NRF_SUCCESS);
+  //assert(ret == NRF_SUCCESS);
+  //printf("ret %d, success %d\n", ret, NRF_SUCCESS);
 }
 
 // See moto_bit.h
@@ -83,7 +83,7 @@ static void set_straight() {
 void moto_bit_turn(float angle, float speed) {
     assert(speed >= 0);
 
-    float millis = angle / DEG_PER_UNIT_DIST / speed * 1000;
+    float millis = (angle >= 0 ? angle : -1*angle) / DEG_PER_UNIT_DIST / speed;
     if (angle > 0) {
         set_left_turn();
     } else {
@@ -104,10 +104,10 @@ void moto_bit_set_speed(float speed) {
     if (speed >= 0) {
         // Forward direction: MSB is 1, lower bits are 0-127, the larger the faster
         speed_val = speed * 127;
-        speed_val &= 128;
+        speed_val += 128;
     } else {
         // Reverse direction: MSB is 0, lower bits are 0-127, the larger the slower
-        speed_val = 127 - (speed * 127);
+        speed_val = 128 + (speed * 127);
     }
 
     i2c_reg_write(MOTO_BIT_ADDR, LEFT_MOTOR, speed_val);
