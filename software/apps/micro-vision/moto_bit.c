@@ -1,11 +1,21 @@
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <math.h>
 
 #include "moto_bit.h"
 #include "nrf_delay.h"
+#include <stdio.h>
+#include "nrf_delay.h"
+#include "nrf_twi_mngr.h"
+
+#include "microbit_v2.h"
+#include "moto_bit.h"
 
 static const nrf_twi_mngr_t* i2c_interface = NULL;
 
-static float DEG_PER_UNIT_DIST = 1.0f; // TODO
+static float DEG_PER_UNIT_DIST = 0.1f; // TODO
 
 // Helper function to perform a 1-byte I2C read of a given register
 //
@@ -19,7 +29,8 @@ static uint8_t i2c_reg_read(uint8_t i2c_addr, uint8_t reg_addr) {
     NRF_TWI_MNGR_WRITE(i2c_addr, &reg_addr, 1, NRF_TWI_MNGR_NO_STOP),
     NRF_TWI_MNGR_READ(i2c_addr, &rx_buf, 1, 0)
   };
-  nrf_twi_mngr_perform(i2c_interface, NULL, read_transfer, 2, NULL);
+  ret_code_t ret = nrf_twi_mngr_perform(i2c_interface, NULL, read_transfer, 2, NULL);
+  assert(ret == NRF_SUCCESS);
 
   return rx_buf;
 }
@@ -34,7 +45,9 @@ static void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data) {
   nrf_twi_mngr_transfer_t const write_transfer[] = {
     NRF_TWI_MNGR_WRITE(i2c_addr, datas, 2, 0),
   };
-  nrf_twi_mngr_perform(i2c_interface, NULL, write_transfer, 1, NULL);
+  ret_code_t ret = nrf_twi_mngr_perform(i2c_interface, NULL, write_transfer, 1, NULL);
+  assert(ret == NRF_SUCCESS);
+  printf("ret %d, success %d\n", ret, NRF_SUCCESS);
 }
 
 // See moto_bit.h
@@ -42,6 +55,8 @@ void moto_bit_init(const nrf_twi_mngr_t* i2c) {
     assert(i2c != NULL);
     i2c_interface = i2c;
     moto_bit_enable_motors();
+    //i2c_reg_write(MOTO_BIT_ADDR, LEFT_MOTOR, 255);
+    //i2c_reg_write(MOTO_BIT_ADDR, RIGHT_MOTOR, 255);
 }
 
 // Helper function that sets motor inversion such that
@@ -116,11 +131,13 @@ void moto_bit_set_motor_inverted(moto_bit_reg_t motor, bool inverted) {
 
 // See moto_bit.h
 void moto_bit_disable_motors() {
+    //i2c_reg_write(MOTO_BIT_ADDR, ENABLE_MOTORS, 0);
     moto_bit_set_motors_enabled(false);
 }
 
 // See moto_bit.h
 void moto_bit_enable_motors() {
+    //i2c_reg_write(MOTO_BIT_ADDR, ENABLE_MOTORS, 1);
     moto_bit_set_motors_enabled(true);
 }
 
