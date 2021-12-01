@@ -8,6 +8,9 @@
 
 #include "microbit_v2.h"
 #include "moto_bit.h"
+#include "gyro.h"
+
+#define THRESHOLD 800
 
 // Global variables
 NRF_TWI_MNGR_DEF(twi_mngr_instance, 1, 0);
@@ -40,6 +43,10 @@ int main(void) {
   nrf_twi_mngr_init(&twi_mngr_instance, &i2c_config);
   printf("done!\n");
 
+  printf("Initializing gyro...");
+  gyro_init(&twi_mngr_instance);
+  printf("done!\n");
+/*
   printf("Initializing moto:bit...");
   moto_bit_init(&twi_mngr_instance);
   printf("done!\n");
@@ -72,9 +79,22 @@ int main(void) {
 
   printf("Stopping\n");
   moto_bit_stop();
-
+*/
   while (1) {
-    nrf_delay_ms(1000);
+    gyro_data_t gyro_data = gyro_read();
+
+    if (abs(gyro_data.x) < THRESHOLD) {
+      gyro_data.x = 0;
+    }
+    if (abs(gyro_data.y) < THRESHOLD) {
+      gyro_data.y = 0;
+    }
+    if (abs(gyro_data.z) < THRESHOLD) {
+      gyro_data.z = 0;
+    }
+
+    printf("%d, %d, %d\n", gyro_data.x, gyro_data.y, gyro_data.z);
+    nrf_delay_ms(100);
   }
 }
 

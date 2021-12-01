@@ -5,11 +5,9 @@
 
 #include "moto_bit.h"
 #include "nrf_delay.h"
-#include "nrf_delay.h"
 #include "nrf_twi_mngr.h"
 
 #include "microbit_v2.h"
-#include "moto_bit.h"
 #include "nrf_assert.h"
 
 static const nrf_twi_mngr_t* i2c_interface = NULL;
