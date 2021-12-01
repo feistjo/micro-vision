@@ -40,41 +40,11 @@ int main(void) {
   nrf_twi_mngr_init(&twi_mngr_instance, &i2c_config);
   printf("done!\n");
 
-  printf("Initializing moto:bit...");
-  moto_bit_init(&twi_mngr_instance);
-  printf("done!\n");
-
-  printf("Moving forward\n");
-  moto_bit_set_speed(1.0f);
-  nrf_delay_ms(2000);
-
-  printf("Turning left\n");
-  moto_bit_turn(90, 0.25f);
-
-  printf("Moving forward\n");
-  moto_bit_set_speed(0.5f);
-  nrf_delay_ms(2000);
-
-  printf("Stopping\n");
-  moto_bit_stop();
-  nrf_delay_ms(1000);
-
-  printf("Moving backward\n");
-  moto_bit_set_speed(-0.5f);
-  nrf_delay_ms(2000);
-
-  printf("Turning right\n");
-  moto_bit_turn(-90, 0.25f);
-
-  printf("Moving backward\n");
-  moto_bit_set_speed(-1.0f);
-  nrf_delay_ms(2000);
-
-  printf("Stopping\n");
-  moto_bit_stop();
-
+  printf("Will parrot all serial communications");
+  char* inbuf = ['a'];
   while (1) {
-    nrf_delay_ms(1000);
+    printf("In as decimal: %d", *inbuf);
+    _read(NULL, inbuf, 1);
   }
 }
 
