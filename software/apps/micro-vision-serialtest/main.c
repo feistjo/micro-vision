@@ -24,6 +24,7 @@ static void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data) {
   };
   nrf_twi_mngr_perform(&twi_mngr_instance, NULL, write_transfer, 1, NULL);
 }
+int _read(int file, char * p_char, int len);
 
 int main(void) {
   printf("\n==============\nBoard started!\n==============\nSleeping for 2 seconds to give the moto:bit time to initialize...");
@@ -39,12 +40,23 @@ int main(void) {
   i2c_config.interrupt_priority = 0;
   nrf_twi_mngr_init(&twi_mngr_instance, &i2c_config);
   printf("done!\n");
+  
+  printf("Initializing moto:bit...");
+  moto_bit_init(&twi_mngr_instance);
+  printf("done!\n");
 
   printf("Will parrot all serial communications");
-  char* inbuf = ['a'];
+  char inbuf[1];
   while (1) {
-    printf("In as decimal: %d", *inbuf);
-    _read(NULL, inbuf, 1);
+    int read_status = _read(0, inbuf, 1);
+    if (read_status == -1) {
+      printf("Read error\n");
+    } else {
+      printf("In as decimal: %d\n", *inbuf);
+      int8_t angle = *(int8_t*)inbuf;
+      moto_bit_turn(angle, 1.0f);
+    }
+    nrf_delay_ms(1000);
   }
 }
 
