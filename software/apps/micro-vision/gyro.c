@@ -6,6 +6,7 @@ static const nrf_twi_mngr_t* i2c_interface = NULL;
 
 uint8_t GYRO_ADDR = 0b1101011;
 uint8_t GYRO_DATA_READY_MASK = 0b10;
+float GYRO_TICKS_PER_DEGREE = 1000.0f; // TODO
 
 // Helper function to perform a 1-byte I2C read of a given register
 //

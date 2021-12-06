@@ -41,6 +41,8 @@ typedef struct {
     int16_t z;
 } gyro_data_t;
 
+float GYRO_TICKS_PER_DEGREE;
+
 /**
  * Initialize gyro interface.
  *

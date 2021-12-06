@@ -5,6 +5,7 @@
 
 #include "nrf_delay.h"
 #include "nrf_twi_mngr.h"
+#include "app_timer.h"
 
 #include "microbit_v2.h"
 #include "moto_bit.h"
@@ -15,22 +16,13 @@
 // Global variables
 NRF_TWI_MNGR_DEF(twi_mngr_instance, 1, 0);
 
-// Helper function to perform a 1-byte I2C write of a given register
-//
-// i2c_addr - address of the device to write to
-// reg_addr - address of the register within the device to write
-static void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data) {
-  //Note: there should only be a single two-byte transfer to be performed
-  uint8_t datas[] = {reg_addr, data};
-  nrf_twi_mngr_transfer_t const write_transfer[] = {
-    NRF_TWI_MNGR_WRITE(i2c_addr, datas, 2, 0),
-  };
-  nrf_twi_mngr_perform(&twi_mngr_instance, NULL, write_transfer, 1, NULL);
-}
-
 int main(void) {
   printf("\n==============\nBoard started!\n==============\nSleeping for 2 seconds to give the moto:bit time to initialize...");
   nrf_delay_ms(2000);
+  printf("done!\n");
+
+  printf("Initializing app_timer library...");
+  app_timer_init();
   printf("done!\n");
 
   // Initialize I2C peripheral and driver
@@ -46,7 +38,7 @@ int main(void) {
   printf("Initializing gyro...");
   gyro_init(&twi_mngr_instance);
   printf("done!\n");
-/*
+
   printf("Initializing moto:bit...");
   moto_bit_init(&twi_mngr_instance);
   printf("done!\n");
@@ -79,21 +71,8 @@ int main(void) {
 
   printf("Stopping\n");
   moto_bit_stop();
-*/
+
   while (1) {
-    gyro_data_t gyro_data = gyro_read();
-
-    if (abs(gyro_data.x) < THRESHOLD) {
-      gyro_data.x = 0;
-    }
-    if (abs(gyro_data.y) < THRESHOLD) {
-      gyro_data.y = 0;
-    }
-    if (abs(gyro_data.z) < THRESHOLD) {
-      gyro_data.z = 0;
-    }
-
-    printf("%d, %d, %d\n", gyro_data.x, gyro_data.y, gyro_data.z);
     nrf_delay_ms(100);
   }
 }
