@@ -18,6 +18,7 @@ static const nrf_twi_mngr_t* i2c_interface = NULL;
 
 static float THRESHOLD = 100.0f; // TODO
 static float curr_angle = 0;
+static int GYRO_SAMPLES_PER_SECOND = 512;
 
 // Helper function to perform a 1-byte I2C write of a given register
 //
@@ -90,7 +91,7 @@ void moto_bit_turn(float angle, float speed) {
 
     curr_angle = 0;
     int8_t initial_sign = sign(angle); // sign(angle - curr_angle) == sign(angle - 0) == sign(angle)
-    app_timer_start(gyro_sample_timer, 32786 / 100, NULL); // gyro runs at 104 hz, so if we sample at 100 hz there _should_ always be data relatively quickly
+    app_timer_start(gyro_sample_timer, 32786 / GYRO_SAMPLES_PER_SECOND, NULL);
 
     if (angle > 0) {
         set_left_turn();
@@ -146,13 +147,11 @@ void moto_bit_set_motor_inverted(moto_bit_reg_t motor, bool inverted) {
 
 // See moto_bit.h
 void moto_bit_disable_motors() {
-    //i2c_reg_write(MOTO_BIT_ADDR, ENABLE_MOTORS, 0);
     moto_bit_set_motors_enabled(false);
 }
 
 // See moto_bit.h
 void moto_bit_enable_motors() {
-    //i2c_reg_write(MOTO_BIT_ADDR, ENABLE_MOTORS, 1);
     moto_bit_set_motors_enabled(true);
 }
 

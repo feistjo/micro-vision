@@ -36,7 +36,7 @@ int main(void) {
   printf("done!\n");
 
   printf("Initializing gyro...");
-  gyro_init(&twi_mngr_instance);
+  gyro_init(&twi_mngr_instance, GYRO_833_HZ);
   printf("done!\n");
 
   printf("Initializing moto:bit...");

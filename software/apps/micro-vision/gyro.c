@@ -41,15 +41,14 @@ static void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data) {
 }
 
 // See gyro.h
-void gyro_init(const nrf_twi_mngr_t* i2c) {
+void gyro_init(const nrf_twi_mngr_t* i2c, gyro_odr_t speed) {
     ASSERT(i2c != NULL);
     i2c_interface = i2c;
 
     uint8_t whoamiValue = i2c_reg_read(GYRO_ADDR, GYRO_WHO_AM_I);
     ASSERT(whoamiValue == 0x6C);
 
-    i2c_reg_write(GYRO_ADDR, GYRO_CTRL2_G, GYRO_104_HZ);
-    //i2c_reg_write(GYRO_ADDR, GYRO_CTRL7_G, 0);
+    i2c_reg_write(GYRO_ADDR, GYRO_CTRL2_G, speed);
 }
 
 gyro_data_t gyro_read() {

@@ -48,8 +48,18 @@ float GYRO_TICKS_PER_DEGREE;
  *
  * @param i2c I2C interface object
  */
-void gyro_init(const nrf_twi_mngr_t* i2c);
+void gyro_init(const nrf_twi_mngr_t* i2c, gyro_odr_t speed);
 
+/**
+ * Read data from the gyro (blocking).
+ *
+ * @return Gyro data
+ */
 gyro_data_t gyro_read();
 
+/**
+ * Returns whether or not the gyro's next sample is ready
+ *
+ * @param if the gyro is ready
+ */
 bool gyro_ready();
