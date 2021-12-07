@@ -20,6 +20,9 @@ static volatile float curr_angle = 0;
 static int GYRO_SAMPLES_PER_SECOND = 100;
 static uint32_t prev_time = 0;
 
+static float LEFT_SCALE = 0.9f;
+static float RIGHT_SCALE = 1.0f;
+
 // Helper function to perform a 1-byte I2C write of a given register
 //
 // i2c_addr - address of the device to write to
@@ -104,13 +107,16 @@ void moto_bit_turn(float angle, float speed) {
 
     moto_bit_set_speed(speed);
 
+    uint32_t lastPrint = app_timer_cnt_get();
     // Wait for turn to complete
     // We know the turn has completed when we go past the goal angle, but the goal angle
     // could be positive or negative, so instead we wait for the sign of the difference
     // between the current and goal angles to change
     while (sign(angle - curr_angle) == initial_sign) {
-        //printf("Curr angle %f\n", curr_angle);
-        //nrf_delay_ms(50);
+        if (app_timer_cnt_get() - lastPrint > 10000) {
+            printf("Curr angle %f\n", curr_angle);
+            lastPrint = app_timer_cnt_get();
+        }
     }
 
     app_timer_stop(gyro_sample_timer);
@@ -122,18 +128,13 @@ void moto_bit_turn(float angle, float speed) {
 void moto_bit_set_speed(float speed) {
     ASSERT(speed <= 1.0f && speed >= -1.0f);
 
-    uint8_t speed_val = 0;
-    if (speed >= 0) {
-        // Forward direction: MSB is 1, lower bits are 0-127, the larger the faster
-        speed_val = speed * 127;
-        speed_val += 128;
-    } else {
-        // Reverse direction: MSB is 0, lower bits are 0-127, the larger the slower
-        speed_val = 128 + (speed * 127);
-    }
+    uint8_t left_speed_val = 0;
+    uint8_t right_speed_val = 0;
+    left_speed_val = speed * LEFT_SCALE * 127 + 128;
+    right_speed_val = speed * RIGHT_SCALE * 127 + 128;
 
-    i2c_reg_write(MOTO_BIT_ADDR, LEFT_MOTOR, speed_val);
-    i2c_reg_write(MOTO_BIT_ADDR, RIGHT_MOTOR, speed_val);
+    i2c_reg_write(MOTO_BIT_ADDR, LEFT_MOTOR, left_speed_val);
+    i2c_reg_write(MOTO_BIT_ADDR, RIGHT_MOTOR, right_speed_val);
 }
 
 // See moto_bit.h

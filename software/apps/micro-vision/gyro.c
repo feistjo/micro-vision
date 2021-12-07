@@ -53,7 +53,7 @@ void gyro_init(const nrf_twi_mngr_t* i2c, gyro_odr_t speed) {
     i2c_reg_write(GYRO_ADDR, GYRO_CTRL4_G, 0b10); // Enables gyro low pass filter
     i2c_reg_write(GYRO_ADDR, GYRO_CTRL6_G, 0b000); // Sets low pass filter bandwidth
 
-    gyro_offset = gyro_read();
+    //gyro_offset = gyro_read();
 }
 
 gyro_data_t gyro_read() {
@@ -71,9 +71,9 @@ gyro_data_t gyro_read() {
   uint16_t zUnsigned = (zhigh << 8) | zlow;
 
   gyro_data_t gyro_data;
-  gyro_data.x = *((int16_t*)&xUnsigned) - gyro_offset.x;
-  gyro_data.y = *((int16_t*)&yUnsigned) - gyro_offset.y;
-  gyro_data.z = *((int16_t*)&zUnsigned) - gyro_offset.z;
+  gyro_data.x = *((int16_t*)&xUnsigned);
+  gyro_data.y = *((int16_t*)&yUnsigned);
+  gyro_data.z = *((int16_t*)&zUnsigned);
 
   return gyro_data;
 }
