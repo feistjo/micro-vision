@@ -17,9 +17,11 @@ APP_TIMER_DEF(gyro_sample_timer);
 static const nrf_twi_mngr_t* i2c_interface = NULL;
 
 static volatile float curr_angle = 0;
-static int GYRO_SAMPLES_PER_SECOND = 100;
+static uint8_t GYRO_SAMPLES_PER_SECOND = 100;
 static uint32_t prev_time = 0;
+static uint32_t TIMER_TICKS_PER_SECOND = 32786;
 
+// Our moto:bit drifts to the right, so we have to drive the left wheel a little slower
 static float LEFT_SCALE = 0.9f;
 static float RIGHT_SCALE = 1.0f;
 
@@ -42,7 +44,7 @@ static void gyro_sample(void* _unused) {
     gyro_data_t gyro_data = gyro_read();
 
     uint32_t elapsed_ticks = app_timer_cnt_get() - prev_time;
-    float seconds = elapsed_ticks / 32786.0f;
+    float seconds = elapsed_ticks / (float)TIMER_TICKS_PER_SECOND;
 
     // Gyro reports are a scaled value of degrees per second, so the amount we've traveled
     // is the number of ticks, divided by the number of ticks per degree per second (which
@@ -97,7 +99,7 @@ void moto_bit_turn(float angle, float speed) {
     curr_angle = 0;
     int8_t initial_sign = sign(angle); // sign(angle - curr_angle) == sign(angle - 0) == sign(angle)
     prev_time = app_timer_cnt_get();
-    app_timer_start(gyro_sample_timer, 32786 / GYRO_SAMPLES_PER_SECOND, NULL);
+    app_timer_start(gyro_sample_timer, TIMER_TICKS_PER_SECOND / GYRO_SAMPLES_PER_SECOND, NULL);
 
     if (angle > 0) {
         set_left_turn();
@@ -113,7 +115,7 @@ void moto_bit_turn(float angle, float speed) {
     // could be positive or negative, so instead we wait for the sign of the difference
     // between the current and goal angles to change
     while (sign(angle - curr_angle) == initial_sign) {
-        if (app_timer_cnt_get() - lastPrint > 10000) {
+        if (app_timer_cnt_get() - lastPrint > 10000) { // Prints roughly 3 times a second
             printf("Curr angle %f\n", curr_angle);
             lastPrint = app_timer_cnt_get();
         }

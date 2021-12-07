@@ -6,8 +6,9 @@ static const nrf_twi_mngr_t* i2c_interface = NULL;
 
 uint8_t GYRO_ADDR = 0b1101011;
 uint8_t GYRO_DATA_READY_MASK = 0b10;
-float GYRO_TICKS_PER_DEGREE_PER_SECOND = 100.0f; // TODO
-static gyro_data_t gyro_offset;
+uint8_t GYRO_WHO_AM_I_VALUE = 0x6C;
+uint8_t GYRO_CTRL4_LOW_PASS_ENABLE = 0b10;
+float GYRO_TICKS_PER_DEGREE_PER_SECOND = 100.0f;
 
 // Helper function to perform a 1-byte I2C read of a given register
 //
@@ -47,13 +48,11 @@ void gyro_init(const nrf_twi_mngr_t* i2c, gyro_odr_t speed) {
     i2c_interface = i2c;
 
     uint8_t whoamiValue = i2c_reg_read(GYRO_ADDR, GYRO_WHO_AM_I);
-    ASSERT(whoamiValue == 0x6C);
+    ASSERT(whoamiValue == GYRO_WHO_AM_I_VALUE);
 
     i2c_reg_write(GYRO_ADDR, GYRO_CTRL2_G, speed);
-    i2c_reg_write(GYRO_ADDR, GYRO_CTRL4_G, 0b10); // Enables gyro low pass filter
+    i2c_reg_write(GYRO_ADDR, GYRO_CTRL4_G, GYRO_CTRL4_LOW_PASS_ENABLE);
     i2c_reg_write(GYRO_ADDR, GYRO_CTRL6_G, 0b000); // Sets low pass filter bandwidth
-
-    //gyro_offset = gyro_read();
 }
 
 gyro_data_t gyro_read() {
