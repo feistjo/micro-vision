@@ -9,6 +9,8 @@ uint8_t GYRO_ADDR;
 typedef enum {
     GYRO_CTRL2_G = 0x11,
     GYRO_WHO_AM_I = 0x0F,
+    GYRO_CTRL4_G = 0x13,
+    GYRO_CTRL6_G = 0x15,
     GYRO_CTRL7_G = 0x16, // Defaults of 0 should be fine?
     GYRO_STATUS_REG = 0x1E,
     GYRO_OUTX_L_G = 0x22,
@@ -16,7 +18,7 @@ typedef enum {
     GYRO_OUTY_L_G = 0x24,
     GYRO_OUTY_H_G = 0x25,
     GYRO_OUTZ_L_G = 0x26,
-    GYRO_OUTZ_H_G = 0x27
+    GYRO_OUTZ_H_G = 0x27,
 } gyro_reg_t;
 
 typedef enum {
@@ -41,7 +43,7 @@ typedef struct {
     int16_t z;
 } gyro_data_t;
 
-float GYRO_TICKS_PER_DEGREE;
+float GYRO_TICKS_PER_DEGREE_PER_SECOND;
 
 /**
  * Initialize gyro interface.

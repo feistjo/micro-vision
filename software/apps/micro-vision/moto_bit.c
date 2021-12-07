@@ -16,9 +16,9 @@ APP_TIMER_DEF(gyro_sample_timer);
 
 static const nrf_twi_mngr_t* i2c_interface = NULL;
 
-static float THRESHOLD = 100.0f; // TODO
-static float curr_angle = 0;
-static int GYRO_SAMPLES_PER_SECOND = 512;
+static volatile float curr_angle = 0;
+static int GYRO_SAMPLES_PER_SECOND = 100;
+static uint32_t prev_time = 0;
 
 // Helper function to perform a 1-byte I2C write of a given register
 //
@@ -38,12 +38,14 @@ static void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data) {
 static void gyro_sample(void* _unused) {
     gyro_data_t gyro_data = gyro_read();
 
-    // filter noise so we don't accumulate error too much
-    if (fabs(gyro_data.z) < THRESHOLD) {
-      gyro_data.z = 0;
-    }
+    uint32_t elapsed_ticks = app_timer_cnt_get() - prev_time;
+    float seconds = elapsed_ticks / 32786.0f;
 
-    curr_angle += gyro_data.z / GYRO_TICKS_PER_DEGREE;
+    // Gyro reports are a scaled value of degrees per second, so the amount we've traveled
+    // is the number of ticks, divided by the number of ticks per degree per second (which
+    // gives the number of degrees per second), and then times seconds, which give degrees
+    curr_angle += gyro_data.z / GYRO_TICKS_PER_DEGREE_PER_SECOND * seconds;
+    prev_time = app_timer_cnt_get();
 }
 
 // See moto_bit.h
@@ -91,6 +93,7 @@ void moto_bit_turn(float angle, float speed) {
 
     curr_angle = 0;
     int8_t initial_sign = sign(angle); // sign(angle - curr_angle) == sign(angle - 0) == sign(angle)
+    prev_time = app_timer_cnt_get();
     app_timer_start(gyro_sample_timer, 32786 / GYRO_SAMPLES_PER_SECOND, NULL);
 
     if (angle > 0) {
@@ -105,7 +108,10 @@ void moto_bit_turn(float angle, float speed) {
     // We know the turn has completed when we go past the goal angle, but the goal angle
     // could be positive or negative, so instead we wait for the sign of the difference
     // between the current and goal angles to change
-    while (sign(angle - curr_angle) == initial_sign) {}
+    while (sign(angle - curr_angle) == initial_sign) {
+        //printf("Curr angle %f\n", curr_angle);
+        //nrf_delay_ms(50);
+    }
 
     app_timer_stop(gyro_sample_timer);
     moto_bit_set_speed(0);

@@ -43,37 +43,15 @@ int main(void) {
   moto_bit_init(&twi_mngr_instance);
   printf("done!\n");
 
-  printf("Moving forward\n");
-  moto_bit_set_speed(1.0f);
-  nrf_delay_ms(2000);
-
-  printf("Turning left\n");
-  moto_bit_turn(90, 0.25f);
-
-  printf("Moving forward\n");
-  moto_bit_set_speed(0.5f);
-  nrf_delay_ms(2000);
-
-  printf("Stopping\n");
-  moto_bit_stop();
-  nrf_delay_ms(1000);
-
-  printf("Moving backward\n");
-  moto_bit_set_speed(-0.5f);
-  nrf_delay_ms(2000);
-
-  printf("Turning right\n");
-  moto_bit_turn(-90, 0.25f);
-
-  printf("Moving backward\n");
-  moto_bit_set_speed(-1.0f);
-  nrf_delay_ms(2000);
-
-  printf("Stopping\n");
-  moto_bit_stop();
-
   while (1) {
-    nrf_delay_ms(100);
+    printf("Turning left 90\n");
+    moto_bit_turn(90, 0.5f);
+    printf("Finished turn!\n");
+    nrf_delay_ms(1000);
+    printf("Turning right 90\n");
+    moto_bit_turn(-90, 0.5f);
+    printf("Finished turn!\n");
+    nrf_delay_ms(1000);
   }
 }
 
