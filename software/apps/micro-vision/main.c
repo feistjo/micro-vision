@@ -46,7 +46,9 @@ int main(void) {
   //printf("Reading input");
   char inbuf[1];
   float speed = 0.375f;
-  moto_bit_set_speed(speed);
+
+  // We won't move initially so that the pi has time to boot
+  // We will move forward after our first turn
   while (1) {
     int read_status = _read(0, inbuf, 1);
     if (read_status == -1) {
