@@ -22,7 +22,7 @@ static uint32_t prev_time = 0;
 static uint32_t TIMER_TICKS_PER_SECOND = 32786;
 
 // Our moto:bit drifts to the right, so we have to drive the left wheel a little slower
-static float LEFT_SCALE = 0.9f;
+static float LEFT_SCALE = 0.85f;
 static float RIGHT_SCALE = 1.0f;
 
 // Helper function to perform a 1-byte I2C write of a given register

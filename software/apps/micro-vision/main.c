@@ -39,6 +39,7 @@ int main(void) {
 
   char inbuf[1];
   float speed = 0.375f;
+  float turn_speed = 0.75f;
 
   // We won't move initially so that the pi has time to boot
   // We will move forward after our first turn
@@ -51,7 +52,7 @@ int main(void) {
       angle = -angle; // the angles sent by the pi are backwards from our perspective
 
       printf("Angle to turn: %d\n", angle);
-      moto_bit_turn(angle, speed);
+      moto_bit_turn(angle, turn_speed);
       printf("done turn\n"); // send something back to indicate we're done
 
       moto_bit_set_speed(speed);
